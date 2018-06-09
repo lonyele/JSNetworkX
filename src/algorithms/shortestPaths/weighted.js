@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 import {
   Map,
@@ -7,9 +7,9 @@ import {
   nodesAreEqual,
   getDefault,
   sprintf
-} from '../../_internals';
+} from "../../_internals";
 
-import JSNetworkXNoPath from '../../exceptions/JSNetworkXNoPath';
+import JSNetworkXNoPath from "../../exceptions/JSNetworkXNoPath";
 
 /**
  * Returns the shortest path from `source` to `target` in a weighted graph G.
@@ -36,16 +36,18 @@ import JSNetworkXNoPath from '../../exceptions/JSNetworkXNoPath';
  *   - weight(='weight'): Edge data key corresponding to the edge weight
  * @return {Array} List of nodes in a shortest path
  */
-export async function dijkstraPath(G, {source, target, weight='weight'}) {
-  var [distances, paths] = // eslint-disable-line no-unused-vars
-    await singleSourceDijkstra(G, {source, target, weight});
+export async function dijkstraPath(G, { source, target, weight = "weight" }) {
+  var [distances, paths] = await singleSourceDijkstra(G, {
+    // eslint-disable-line no-unused-vars
+    source,
+    target,
+    weight
+  });
   var path = paths.get(target);
   if (!path) {
-    throw new JSNetworkXNoPath(sprintf(
-      'Node %j is not reachable from %j',
-      source,
-      target
-    ));
+    throw new JSNetworkXNoPath(
+      sprintf("Node %j is not reachable from %j", source, target)
+    );
   }
   return path;
 }
@@ -76,15 +78,16 @@ export async function dijkstraPath(G, {source, target, weight='weight'}) {
  *   - weight(='weight'): Edge data key corresponding to the edge weight
  * @return {number} Shortest path length
  */
-export async function dijkstraPathLength(G, {source, target, weight='weight'}) {
-  var distances = await singleSourceDijkstraPathLength(G, {source, weight});
+export async function dijkstraPathLength(
+  G,
+  { source, target, weight = "weight" }
+) {
+  var distances = await singleSourceDijkstraPathLength(G, { source, weight });
   var distance = distances.get(target);
   if (distance == null) {
-    throw new JSNetworkXNoPath(sprintf(
-      'Node %j is not reachable from %j',
-      source,
-      target
-    ));
+    throw new JSNetworkXNoPath(
+      sprintf("Node %j is not reachable from %j", source, target)
+    );
   }
   return distance;
 }
@@ -130,11 +133,15 @@ function minMultiEdgeWeight(keydata, weight) {
  */
 export async function singleSourceDijkstraPath(
   G,
-  {source, cutoff, weight='weight'}
+  { source, cutoff, weight = "weight" }
 ) {
- var [length, path] = // eslint-disable-line no-unused-vars
-   await singleSourceDijkstra(G, {source, cutoff, weight});
- return path;
+  var [length, path] = await singleSourceDijkstra(G, {
+    // eslint-disable-line no-unused-vars
+    source,
+    cutoff,
+    weight
+  });
+  return [length, path];
 }
 
 /**
@@ -170,7 +177,7 @@ export async function singleSourceDijkstraPath(
  */
 export async function singleSourceDijkstraPathLength(
   G,
-  {source, cutoff, weight='weight'}
+  { source, cutoff, weight = "weight" }
 ) {
   var distances = new Map();
   var seen = new Map([[source, 0]]);
@@ -185,12 +192,10 @@ export async function singleSourceDijkstraPathLength(
     distances.set(v, d);
     let edata;
     if (G.isMultigraph()) {
-      edata = mapIterator(
-        G.get(v),
-        ([w, keydata]) => { // eslint-disable-line no-loop-func
-          return [w, {[weight]: minMultiEdgeWeight(keydata, weight)}];
-        }
-      );
+      edata = mapIterator(G.get(v), ([w, keydata]) => {
+        // eslint-disable-line no-loop-func
+        return [w, { [weight]: minMultiEdgeWeight(keydata, weight) }];
+      });
     } else {
       edata = G.get(v);
     }
@@ -203,7 +208,7 @@ export async function singleSourceDijkstraPathLength(
       }
       if (distances.has(w)) {
         if (vwDistance < distances.get(w)) {
-          throw new Error('Contradictory paths found: negative weights?');
+          throw new Error("Contradictory paths found: negative weights?");
         }
       } else if (!seen.has(w) || vwDistance < seen.get(w)) {
         seen.set(w, vwDistance);
@@ -257,7 +262,7 @@ export async function singleSourceDijkstraPathLength(
  */
 export async function singleSourceDijkstra(
   G,
-  {source, target, cutoff, weight='weight'}
+  { source, target, cutoff, weight = "weight" }
 ) {
   if (nodesAreEqual(source, target)) {
     return [new Map([[source, 0]]), new Map([[source, target]])];
@@ -280,12 +285,10 @@ export async function singleSourceDijkstra(
     }
     let edata;
     if (G.isMultigraph()) {
-      edata = mapIterator(
-        G.get(v),
-        ([w, keydata]) => { // eslint-disable-line no-loop-func
-          return [w, {[weight]: minMultiEdgeWeight(keydata, weight)}];
-        }
-      );
+      edata = mapIterator(G.get(v), ([w, keydata]) => {
+        // eslint-disable-line no-loop-func
+        return [w, { [weight]: minMultiEdgeWeight(keydata, weight) }];
+      });
     } else {
       edata = G.get(v);
     }
@@ -298,7 +301,7 @@ export async function singleSourceDijkstra(
       }
       if (distances.has(w)) {
         if (vwDistance < distances.get(w)) {
-          throw new Error('Contradictory paths found: negative weights?');
+          throw new Error("Contradictory paths found: negative weights?");
         }
       } else if (!seen.has(w) || vwDistance < seen.get(w)) {
         seen.set(w, vwDistance);
@@ -307,7 +310,7 @@ export async function singleSourceDijkstra(
       }
     }
   }
-
+  console.log("요거 됨? distance", distances, paths);
   return [distances, paths];
 }
 
@@ -343,16 +346,13 @@ export async function singleSourceDijkstra(
  */
 export async function allPairsDijkstraPathLength(
   G,
-  {cutoff, weight='weight'}={}
+  { cutoff, weight = "weight" } = {}
 ) {
   var distances = new Map();
-  var parameters = {weight, cutoff};
+  var parameters = { weight, cutoff };
   for (let source of G) {
     parameters.source = source;
-    distances.set(
-      source,
-      await singleSourceDijkstraPathLength(G, parameters)
-    );
+    distances.set(source, await singleSourceDijkstraPathLength(G, parameters));
   }
   return distances;
 }
@@ -381,15 +381,15 @@ export async function allPairsDijkstraPathLength(
  *     returned.
  * @return {Map} A Map of Maps of shortest paths.
  */
-export async function allPairsDijkstraPath(G, {cutoff, weight='weight'}={}) {
+export async function allPairsDijkstraPath(
+  G,
+  { cutoff, weight = "weight" } = {}
+) {
   var paths = new Map();
-  var parameters = {weight, cutoff};
+  var parameters = { weight, cutoff };
   for (let source of G) {
     parameters.source = source;
-    paths.set(
-      source,
-      await singleSourceDijkstraPath(G, parameters)
-    );
+    paths.set(source, await singleSourceDijkstraPath(G, parameters));
   }
   return paths;
 }
