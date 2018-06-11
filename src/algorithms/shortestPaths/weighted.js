@@ -310,7 +310,7 @@ export async function singleSourceDijkstra(
       }
     }
   }
-  console.log("요거 됨? distance", distances, paths);
+  // console.log("요거 됨? distance", distances, paths);
   return [distances, paths];
 }
 
