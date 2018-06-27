@@ -1,6 +1,6 @@
 {
   "name": "lonyele-jsnetworkx",
-  "version": "0.3.6",
+  "version": "0.3.8",
   "description": "A graph processing and visualization library for JavaScript (port of NetworkX for Python).",
   "license": "BSD-3-Clause",
   "keywords": [
@@ -57,10 +57,10 @@
   "scripts": {
     "prepublish": "npm run build:node",
     "clean": "rm -rf node/ jsnetworkx.js jsnetworkx-dev.js",
-    "build:node": "node scripts/build-node.js src/ node/",
+    "build:node": "rm -rf node/ && node scripts/build-node.js src/ node/",
     "build:node:dev": "rm -rf node/ && node scripts/build-node.js --dev src/ node/",
     "watch:node": "npm run build:node:dev -- -w",
-    "build:browser": "npm run build:node && browserify node/browser.js -s jsnx | uglifyjs -cmo $JSNETWORKX_BUNDLE)",
+    "build:browser": "(export JSNETWORKX_BUNDLE=jsnetworkx.js; npm run build:node && rm -f $JSNETWORKX_BUNDLE && browserify node/browser.js -s jsnx | uglifyjs -cmo $JSNETWORKX_BUNDLE)",
     "build:browser:dev": "(export JSNETWORKX_BUNDLE=jsnetworkx-dev.js; npm run build:node:dev && rm -f $JSNETWORKX_BUNDLE && NODE_ENV=dev browserify node/browser.js -ds jsnx > $JSNETWORKX_BUNDLE)",
     "watch:browser": "(export JSNETWORKX_BUNDLE=jsnetworkx-dev.js; rm -f $JSNETWORKX_BUNDLE && NODE_ENV=dev watchify src/browser.js -t ./transforms/es7 -vds jsnx -o $JSNETWORKX_BUNDLE)",
     "test": "npm run build:node:dev && npm run test:fast",
